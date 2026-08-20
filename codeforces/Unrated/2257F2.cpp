@@ -3,8 +3,8 @@
 // Contest: Contest-2257
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/2257/submission/387801732
-// Solved on: 2026-08-20T13:50:58.260Z
+// URL: https://codeforces.com/contest/2257/submission/387801958
+// Solved on: 2026-08-20T13:55:21.790Z
 
 #include "assert.h"
 #include <algorithm>
@@ -132,7 +132,7 @@ struct Node {
             }
         }
     }
-    Node operator+(const Node b) const {
+    Node operator+(const Node &b) const {
         // auto &a = *this;
         // Node v;
         // FOR(l, x) {
