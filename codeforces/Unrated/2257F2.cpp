@@ -3,8 +3,8 @@
 // Contest: Contest-2257
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/2257/submission/387800575
-// Solved on: 2026-08-20T13:41:57.051Z
+// URL: https://codeforces.com/contest/2257/submission/387801732
+// Solved on: 2026-08-20T13:50:58.260Z
 
 #include "assert.h"
 #include <algorithm>
@@ -133,31 +133,31 @@ struct Node {
         }
     }
     Node operator+(const Node b) const {
-        auto &a = *this;
-        Node v;
-        FOR(l, x) {
-            if (a.a[l][0] == LINF) {
-                continue;
-            }
-            FOR(r, 0, x) {
-                FOR(k, 1, x) {
-                    chmin(v.a[l][r], a.a[l][k] + b.a[k - 1][r]);
-                }
-            }
-        }
-        return v;
         // auto &a = *this;
         // Node v;
         // FOR(l, x) {
+        //     if (a.a[l][0] == LINF) {
+        //         continue;
+        //     }
         //     FOR(r, 0, x) {
-        //         int mn = LINF;
         //         FOR(k, 1, x) {
-        //             chmin(mn, a.a[l][k] + b.a[k - 1][r]);
+        //             chmin(v.a[l][r], a.a[l][k] + b.a[k - 1][r]);
         //         }
-        //         v.a[l][r] = mn;
         //     }
         // }
         // return v;
+        auto &a = *this;
+        Node v;
+        FOR(l, x) {
+            FOR(r, 0, x) {
+                int mn = LINF;
+                FOR(k, 1, x) {
+                    chmin(mn, a.a[l][k] + b.a[k - 1][r]);
+                }
+                v.a[l][r] = mn;
+            }
+        }
+        return v;
     }
 };
 
