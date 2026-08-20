@@ -3,8 +3,8 @@
 // Contest: Contest-2257
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/2257/submission/387793546
-// Solved on: 2026-08-20T12:46:07.284Z
+// URL: https://codeforces.com/contest/2257/submission/387793757
+// Solved on: 2026-08-20T12:48:44.542Z
 
 #include "assert.h"
 #include <algorithm>
@@ -104,7 +104,8 @@ const double eps = 1e-9;
 int x = 5;
 
 struct Node {
-    int a[10][11];
+    array<array<int, 11>, 10> a;
+    // int a[10][11];
     Node() {
         FOR(i, x) {
             fill(all(a[i]), LINF);
@@ -159,6 +160,7 @@ struct Node {
         // return v;
     }
 };
+
 const int BS = 16;
 const int N = 1 << 16;
 Node st[N * 2 + 5];
