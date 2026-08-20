@@ -3,8 +3,8 @@
 // Contest: Contest-2257
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/2257/submission/387793757
-// Solved on: 2026-08-20T12:48:44.542Z
+// URL: https://codeforces.com/contest/2257/submission/387800575
+// Solved on: 2026-08-20T13:41:57.051Z
 
 #include "assert.h"
 #include <algorithm>
@@ -132,7 +132,7 @@ struct Node {
             }
         }
     }
-    Node operator+(const Node b) {
+    Node operator+(const Node b) const {
         auto &a = *this;
         Node v;
         FOR(l, x) {
@@ -161,45 +161,74 @@ struct Node {
     }
 };
 
+template <typename T>
+struct SegTree {
+    vector<Node> st;
+    int size;
+    SegTree(int _size) : size(_size), st(vector<Node>(_size * 4 + 5)) {}
+
+    // void _nodeAssign(Node &a, T &v, int l1, int r1) {
+    //     a.s = v;
+    // }
+
+    // Node _merge(const Node &a, const Node &b) {
+    //     return a + b;
+    // }
+
+    // void _build(vector<T> &a, int v, int l1, int r1) {
+    //     if (l1 == r1) {
+    //         _nodeAssign(st[v], a[l1], l1, l1);
+    //         return;
+    //     }
+    //     int mid = (l1 + r1) >> 1;
+    //     _build(a, 2 * v, l1, mid);
+    //     _build(a, 2 * v + 1, mid + 1, r1);
+    //     st[v] = _merge(st[2 * v], st[2 * v + 1]);
+    // }
+    // void build(vector<T> &a) {
+    //     size = a.size();
+    //     _build(a, 1, 0, size - 1);
+    // }
+
+    void _pointUpdate(int v, int l1, int r1, int upIdx, const T &upV) {
+        if (l1 == r1) {
+            st[v] = upV;
+            return;
+        }
+        int mid = (l1 + r1) >> 1;
+        if (upIdx <= mid) {
+            _pointUpdate(2 * v, l1, mid, upIdx, upV);
+        } else {
+            _pointUpdate(2 * v + 1, mid + 1, r1, upIdx, upV);
+        }
+        st[v] = st[2 * v] + st[2 * v + 1];
+    }
+    void pointUpdate(int upIdx, const T &upV) {
+        _pointUpdate(1, 0, size - 1, upIdx, upV);
+    }
+
+    Node _rangeQuery(int v, int l1, int r1, int queryL, int queryR) {
+        if (queryL <= l1 && r1 <= queryR) {
+            // dbg(v, l1, r1, st[v]);
+            return st[v];
+        }
+        int mid = (l1 + r1) >> 1;
+        if (queryR <= mid) {
+            return _rangeQuery(2 * v, l1, mid, queryL, queryR);
+        }
+        if (queryL > mid) {
+            return _rangeQuery(2 * v + 1, mid + 1, r1, queryL, queryR);
+        }
+        return _rangeQuery(2 * v, l1, mid, queryL, queryR) + _rangeQuery(2 * v + 1, mid + 1, r1, queryL, queryR);
+    }
+    Node rangeQuery(int queryL, int queryR) {
+        return _rangeQuery(1, 0, size - 1, queryL, queryR);
+    }
+};
+
 const int BS = 16;
 const int N = 1 << 16;
-Node st[N * 2 + 5];
-int segsz;
-
-void _pointUpdate(int v, int l1, int r1, int upIdx, const Node &upV) {
-    if (l1 == r1) {
-        st[v] = upV;
-        return;
-    }
-    int mid = (l1 + r1) >> 1;
-    if (upIdx <= mid) {
-        _pointUpdate(2 * v, l1, mid, upIdx, upV);
-    } else {
-        _pointUpdate(2 * v + 1, mid + 1, r1, upIdx, upV);
-    }
-    st[v] = st[2 * v] + st[2 * v + 1];
-}
-void pointUpdate(int upIdx, const Node &upV) {
-    _pointUpdate(1, 0, segsz - 1, upIdx, upV);
-}
-
-Node _rangeQuery(int v, int l1, int r1, int queryL, int queryR) {
-    if (queryL <= l1 && r1 <= queryR) {
-        // dbg(v, l1, r1, st[v]);
-        return st[v];
-    }
-    int mid = (l1 + r1) >> 1;
-    if (queryR <= mid) {
-        return _rangeQuery(2 * v, l1, mid, queryL, queryR);
-    }
-    if (queryL > mid) {
-        return _rangeQuery(2 * v + 1, mid + 1, r1, queryL, queryR);
-    }
-    return _rangeQuery(2 * v, l1, mid, queryL, queryR) + _rangeQuery(2 * v + 1, mid + 1, r1, queryL, queryR);
-}
-Node rangeQuery(int queryL, int queryR) {
-    return _rangeQuery(1, 0, segsz - 1, queryL, queryR);
-}
+// Node st[N * 2 + 5];
 
 int32_t main() {
 #ifndef __APPLE__
@@ -214,7 +243,6 @@ int32_t main() {
     auto solve1 = [&](vii a, viii &qs) {
         int n = a.size();
         int bn = (n + BS - 1) / BS;
-        segsz = bn;
 
         function<Node(int, int)> cal = [&](int l, int r) {
             Node nd(a[l]);
@@ -228,31 +256,33 @@ int32_t main() {
             return cal(st, min(n - 1, st + BS - 1));
         };
 
+        SegTree<Node> seg(bn);
         function<void(int, int, int)> _build = [&](int v, int l1, int r1) {
             if (l1 == r1) {
-                st[v] = calbi(l1);
+                seg.st[v] = calbi(l1);
                 return;
             }
             int mid = (l1 + r1) >> 1;
             _build(2 * v, l1, mid);
             _build(2 * v + 1, mid + 1, r1);
-            st[v] = st[2 * v] + st[2 * v + 1];
+            seg.st[v] = seg.st[2 * v] + seg.st[2 * v + 1];
         };
-        _build(1, 0, segsz - 1);
+        _build(1, 0, bn - 1);
         // FOR(bi, bn) { // very important slow down
         //     pointUpdate(bi, calbi(bi));
         // }
 
         auto update = [&](int i, ii v) {
             int bi = i / BS;
-            pointUpdate(bi, calbi(bi));
+            seg.pointUpdate(bi, calbi(bi));
         };
 
         vi ans;
         for (auto [tp, l, r] : qs) {
             if (tp == 0) {
                 if (l / BS + 1 <= r / BS - 1) {
-                    Node nd = cal(l, (l / BS + 1) * BS - 1) + rangeQuery(l / BS + 1, r / BS - 1) + cal(r / BS * BS, r);
+                    // dbg(l, (l / BS + 1) * BS - 1, r / BS * BS, r);
+                    Node nd = cal(l, (l / BS + 1) * BS - 1) + seg.rangeQuery(l / BS + 1, r / BS - 1) + cal(r / BS * BS, r);
                     ans.pb(nd.a[0][0]);
                 } else {
                     ans.pb(cal(l, r).a[0][0]);
@@ -270,13 +300,40 @@ int32_t main() {
         return ans;
     };
 
+    auto solve2 = [&](vii a, viii &qs) {
+        int n = a.size();
+        int bn = (n + BS - 1) / BS;
+
+        function<Node(int, int)> cal = [&](int l, int r) {
+            Node nd(a[l]);
+            FOR(i, l + 1, r) {
+                nd = nd + Node(a[i]);
+            }
+            return nd;
+        };
+
+        vi ans;
+        for (auto [tp, l, r] : qs) {
+            if (tp == 0) {
+                ans.pb(cal(l, r).a[0][0]);
+            } else if (tp == 1) {
+                auto i = l, x = r;
+                a[i][0] = x;
+            } else if (tp == 2) {
+                auto i = l, x = r;
+                a[i][1] = x;
+            }
+        }
+        return ans;
+    };
+
     mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
     bool TTT = false;
     // TTT = true;
     if (TTT) {
         uniform_int_distribution<int> disttp(0, 2); // including both ends
-        uniform_int_distribution<int> dist(1, 20);  // including both ends
+        uniform_int_distribution<int> dist(1, 33);  // including both ends
         uniform_int_distribution<int> dista(1, 7);
         uniform_int_distribution<int> distb(1, 5);
         // uniform_int_distribution<int> dista(1, 1e7);
@@ -287,7 +344,7 @@ int32_t main() {
             FOR(i, n) {
                 a[i] = {dista(rng), distb(rng)};
             }
-            int Q = 2;
+            int Q = 1;
             viii qs(Q);
             uniform_int_distribution<int> distn(0, n - 1);
 
@@ -307,32 +364,32 @@ int32_t main() {
             }
 
             auto ans1 = solve1(a, qs);
-            // auto ans2 = solve2(a, qs);
-            // if (ans1 != ans2) {
-            //     dbg(T);
-            //     cerr << n << ' ' << Q << ' ' << x << nl;
-            //     FOR(i, n) {
-            //         cerr << a[i][0] << ' ';
-            //     }
-            //     cerr << nl;
+            auto ans2 = solve2(a, qs);
+            if (ans1 != ans2) {
+                dbg(T);
+                cerr << n << ' ' << Q << ' ' << x << nl;
+                FOR(i, n) {
+                    cerr << a[i][0] << ' ';
+                }
+                cerr << nl;
 
-            //     FOR(i, n) {
-            //         cerr << a[i][1] << ' ';
-            //     }
-            //     cerr << nl;
-            //     FOR(i, Q) {
-            //         auto [tp, l, r] = qs[i];
-            //         cerr << (tp ? (char)('0' + tp) : '?') << ' ';
-            //         if (tp == 0) {
-            //             cerr << l + 1 << ' ' << r + 1 << nl;
-            //         } else {
-            //             cerr << l + 1 << ' ' << r << nl;
-            //         }
-            //     }
-            //     dbg(ans1);
-            //     dbg(ans2);
-            //     break;
-            // }
+                FOR(i, n) {
+                    cerr << a[i][1] << ' ';
+                }
+                cerr << nl;
+                FOR(i, Q) {
+                    auto [tp, l, r] = qs[i];
+                    cerr << (tp ? (char)('0' + tp) : '?') << ' ';
+                    if (tp == 0) {
+                        cerr << l + 1 << ' ' << r + 1 << nl;
+                    } else {
+                        cerr << l + 1 << ' ' << r << nl;
+                    }
+                }
+                dbg(ans1);
+                dbg(ans2);
+                break;
+            }
         }
     } else {
 
