@@ -3,8 +3,8 @@
 // Contest: Contest-2257
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/2257/submission/387791123
-// Solved on: 2026-08-20T12:22:34.164Z
+// URL: https://codeforces.com/contest/2257/submission/387792148
+// Solved on: 2026-08-20T12:34:50.764Z
 
 #include "assert.h"
 #include <algorithm>
@@ -154,18 +154,20 @@ struct Node {
             if (a.a[l][0] == LINF)
                 continue;
             int row[11];
-            FOR(r, 0, x)
-            row[r] = LINF;
+            FOR(r, 0, x) {
+                row[r] = LINF;
+            }
             FOR(k, 1, x) {
                 if (b.a[k - 1][0] == LINF)
                     continue;
-                int base = a.a[l][k];
+                // int base = a.a[l][k];
                 FOR(r, 0, x) {
-                    chmin(row[r], base + b.a[k - 1][r]);
+                    chmin(row[r], a.a[l][k] + b.a[k - 1][r]);
                 }
             }
-            FOR(r, 0, x)
-            v.a[l][r] = row[r];
+            FOR(r, 0, x) {
+                v.a[l][r] = row[r];
+            }
         }
         return v;
     }
