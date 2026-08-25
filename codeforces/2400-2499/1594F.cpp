@@ -4,8 +4,8 @@
 // Rating/Difficulty: 2400
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/1594/submission/388311775
-// Solved on: 2026-08-25T04:56:36.198Z
+// URL: https://codeforces.com/contest/1594/submission/388312011
+// Solved on: 2026-08-25T04:59:30.782Z
 
 #include "assert.h"
 #include <algorithm>
@@ -126,13 +126,7 @@ int32_t main() {
         // 0, 1, 2, ... s % k, each group has s / k + 1 member
         // s % k + 1, ... k - 1, each group has s / k member;
         int m = s / k;
-        int mx;
-        if (s % k == 0) {
-            // 0 and s are selected, and in the same group;
-            mx = ((m + 1 - 4 + 1) / 2 + 2) + (k - 1) * ((m + 1) / 2);
-        } else {
-            mx = (s % k + 1) * ((m + 1 + 1) / 2) + (k - s % k - 1) * ((m + 1) / 2);
-        }
+        int mx = (s % k + 1) * ((m + 1 + 1) / 2) + (k - s % k - 1) * ((m + 1) / 2);
         // assert(s % k * (m + 1) + (k - s % k) * m == s);
         // dbg(mx, n);
         return mx < n + 1;
