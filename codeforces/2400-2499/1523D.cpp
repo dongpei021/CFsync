@@ -4,8 +4,8 @@
 // Rating/Difficulty: 2400
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/1523/submission/388535590
-// Solved on: 2026-08-27T06:21:09.557Z
+// URL: https://codeforces.com/contest/1523/submission/388535889
+// Solved on: 2026-08-27T06:24:43.340Z
 
 #include "assert.h"
 #include <algorithm>
@@ -123,7 +123,9 @@ int32_t main() {
     uniform_int_distribution<int> dist(0, n - 1);
     int mx = 0, mxp = 0;
     vi vt(n);
-    FOR(T, 100) {
+    auto begin = std::chrono::steady_clock::now();
+    while ((std::chrono::steady_clock::now() - begin).count() < 2e9) {
+        // FOR(T, 100) {
         int id = dist(rng);
         if (vt[id]) {
             continue;
