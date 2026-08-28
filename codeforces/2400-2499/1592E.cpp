@@ -4,8 +4,8 @@
 // Rating/Difficulty: 2400
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/1592/submission/388683250
-// Solved on: 2026-08-28T13:51:53.055Z
+// URL: https://codeforces.com/contest/1592/submission/388684030
+// Solved on: 2026-08-28T13:59:17.166Z
 
 #include "assert.h"
 #include <algorithm>
@@ -209,9 +209,47 @@ int32_t main() {
         }
         return ans;
     };
+
+    auto solve4 = [](vi &a) {
+        int n = a.size();
+        int M = 20;
+        int ans = 0;
+        vvi mp(2, vi(1 << M, INF));
+        vvi ch(2);
+        auto clear = [&]() {
+            FOR(j, 2) {
+                for (auto x : ch[j]) {
+                    mp[j][x] = INF;
+                }
+                ch[j].clear();
+            }
+        };
+        RFOR(k, M - 1, 0) {
+            int ps2 = 0, s = 0;
+            mp[1][0] = -1;
+            ch[1].pb(0);
+            int msk = (1 << M) - (1 << k);
+            FOR(i, n) {
+                ps2 ^= a[i] & msk;
+                if ((a[i] & (1 << k)) == 0) {
+                    clear();
+                    s++;
+                }
+                auto &mpi = mp[i & 1];
+                if (mpi[ps2] < INF) {
+                    chmax(ans, i - mpi[ps2]);
+                } else {
+                    mpi[ps2] = i;
+                    ch[i & 1].pb(ps2);
+                }
+            }
+            clear();
+        }
+        return ans;
+    };
     iint(n);
     ivi(a, n);
-    cout << solve3(a) << nl;
+    cout << solve4(a) << nl;
 }
 
 // L153> k=2, i=0, ps2=8
