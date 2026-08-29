@@ -3,8 +3,8 @@
 // Contest: Contest-2258
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/2258/submission/388837127
-// Solved on: 2026-08-29T16:58:26.390Z
+// URL: https://codeforces.com/contest/2258/submission/388837196
+// Solved on: 2026-08-29T16:58:56.852Z
 
 #include "assert.h"
 #include <algorithm>
@@ -144,7 +144,7 @@ int32_t main() {
                 break;
             }
             int ans = 0;
-            FOR(x, 1, m / (1 << k) + 1) {
+            FOR(x, 1, m / (1 << k)) {
                 // FOR(x, 1, m) {
                 // x, 2x, 2^(k - 1)x
                 int s = 0;
