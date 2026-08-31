@@ -3,8 +3,8 @@
 // Contest: Contest-2258
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/2258/submission/389021878
-// Solved on: 2026-08-31T16:46:09.313Z
+// URL: https://codeforces.com/contest/2258/submission/389022431
+// Solved on: 2026-08-31T16:51:01.711Z
 
 #include "assert.h"
 #include <algorithm>
@@ -623,6 +623,99 @@ int32_t main() {
         sort(all(ans), greater<int>());
         return ans;
     };
+
+    auto solve41 = [&](vii lra, vii lrb) {
+        // int n = lra.size(), m = lrb.size();
+        auto clear = [](vii &lra, vii &lrb) {
+            vii nlra;
+            for (auto [l, r] : lra) {
+                int i = upper_bound(all(lrb), ii{l, LINF}) - lrb.begin() - 1;
+                if (i >= 0 && i < lrb.size() && lrb[i][0] <= l && lrb[i][1] >= r) {
+
+                } else {
+                    nlra.pb({l, r});
+                }
+            }
+            return nlra;
+        };
+        vvii lr(2);
+        lr[0] = clear(lra, lrb);
+        lr[1] = clear(lrb, lr[0]);
+        vi ans;
+        vi id(2);
+        while (id[0] < lr[0].size() && id[1] < lr[1].size()) {
+            int cid = 0;
+            if (lr[1][id[1]][0] < lr[0][id[0]][0]) {
+                cid = 1;
+            }
+            vii seg;
+            while (id[cid] < lr[cid].size()) {
+                seg.pb(lr[cid][id[cid]++]);
+                if (id[1 - cid] < lr[1 - cid].size() && lr[1 - cid][id[1 - cid]][0] > lr[cid][id[cid] - 1][1]) {
+                    break;
+                }
+                cid ^= 1;
+            }
+            if (seg.size() == 1) {
+                ans.pb(seg[0][1] - seg[0][0] + 1);
+                continue;
+            }
+
+            auto add = [](vi &a, int x) {
+                a.pb(x);
+                RFOR(i, a.size() - 1, 1) {
+                    if (a[i] > a[i - 1]) {
+                        swap(a[i], a[i - 1]);
+                    } else {
+                        break;
+                    }
+                }
+            };
+            vi sfull, swait;
+            FOR(i, seg.size()) {
+                if (i == 0) {
+                    add(sfull, seg[0][1] - seg[0][0] + 1);
+                    add(swait, seg[1][0] - seg[0][0]);
+                } else if (i == seg.size() - 1) {
+                    int l1 = seg[i][1] - seg[i - 1][1];
+                    int l2 = seg[i][1] - seg[i][0] + 1;
+                    add(sfull, l1);
+                    add(swait, l2);
+                    auto nstf = max(sfull, swait);
+                    swap(nstf, sfull);
+                } else {
+                    int l1 = seg[i][1] - seg[i - 1][1];
+                    int l2 = seg[i][1] - seg[i][0] + 1;
+                    auto b0 = sfull, b1 = swait;
+                    add(sfull, l1);
+                    add(swait, l2);
+                    auto nstf = max(sfull, swait);
+
+                    l1 = seg[i + 1][0] - seg[i - 1][1] - 1;
+                    l2 = seg[i + 1][0] - seg[i][0];
+                    add(b0, l1);
+                    add(b1, l2);
+                    auto nstw = max(b0, b1);
+
+                    swap(nstf, sfull);
+                    swap(nstw, swait);
+                }
+            }
+            // dbg(seg);
+            // dbg(sfull);
+            for (int x : sfull) {
+                ans.pb(x);
+            }
+        }
+        FOR(cid, 2) {
+            while (id[cid] < lr[cid].size()) {
+                auto [l, r] = lr[cid][id[cid]++];
+                ans.pb(r - l + 1);
+            }
+        }
+        sort(all(ans), greater<int>());
+        return ans;
+    };
     mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
     bool TTT = false;
@@ -684,7 +777,7 @@ int32_t main() {
             iint(n, m);
             vii lra(n), lrb(m);
             cin >> lra >> lrb;
-            auto ans = solve32(lra, lrb);
+            auto ans = solve41(lra, lrb);
             cout << ans.size() << nl;
             for (int x : ans) {
                 cout << x << ' ';
