@@ -3,8 +3,8 @@
 // Contest: Contest-2258
 // Language: C++20 (GCC 13-64)
 // Verdict: Accepted
-// URL: https://codeforces.com/contest/2258/submission/389008914
-// Solved on: 2026-08-31T14:37:17.349Z
+// URL: https://codeforces.com/contest/2258/submission/389021878
+// Solved on: 2026-08-31T16:46:09.313Z
 
 #include "assert.h"
 #include <algorithm>
@@ -379,6 +379,168 @@ int32_t main() {
         return ans;
     };
 
+    auto solve31 = [&](vii lra, vii lrb) {
+        int n = lra.size(), m = lrb.size();
+        auto clear = [](vii &lra, vii &lrb) {
+            vii nlra;
+            for (auto [l, r] : lra) {
+                int i = upper_bound(all(lrb), ii{l, INF}) - lrb.begin() - 1;
+                if (i >= 0 && i < lrb.size() && lrb[i][0] <= l && lrb[i][1] >= r) {
+
+                } else {
+                    nlra.pb({l, r});
+                }
+            }
+            return nlra;
+        };
+        lra = clear(lra, lrb);
+        lrb = clear(lrb, lra);
+        n = lra.size();
+        m = lrb.size();
+
+        vi xs;
+        FOR(i, n) {
+            xs.pb(lra[i][0]);
+            xs.pb(lra[i][1] + 1);
+        }
+        FOR(i, m) {
+            xs.pb(lrb[i][0]);
+            xs.pb(lrb[i][1] + 1);
+        }
+        auto vx = ccompress(xs);
+        int L = vx.size();
+        FOR(i, n) {
+            lra[i][0] = lower_bound(all(vx), lra[i][0]) - vx.begin();
+            lra[i][1] = lower_bound(all(vx), lra[i][1] + 1) - vx.begin();
+        }
+        FOR(i, m) {
+            lrb[i][0] = lower_bound(all(vx), lrb[i][0]) - vx.begin();
+            lrb[i][1] = lower_bound(all(vx), lrb[i][1] + 1) - vx.begin();
+        }
+        // dbg(lra);
+        // dbg(lrb);
+
+        vi prea(L, L), preb(L, L);
+        FOR(i, n) {
+            FOR(j, lra[i][0] + 1, lra[i][1]) {
+                prea[j] = lra[i][0];
+            }
+        }
+        FOR(i, m) {
+            FOR(j, lrb[i][0] + 1, lrb[i][1]) {
+                preb[j] = lrb[i][0];
+            }
+        }
+        // dbg(prea);
+        // dbg(preb);
+        // dbg(vx);
+
+        vector<multiset<int, greater<int>>> d(L);
+        int cid = -1;
+        FOR(i, 1, L - 1) {
+            d[i] = d[i - 1];
+            int pre = min(prea[i], preb[i]);
+            assert(pre >= i - 3);
+            FOR(j, pre, i - 1) {
+                multiset<int, greater<int>> st;
+                st = d[j];
+                st.insert(vx[i] - vx[j]);
+                chmax(d[i], st);
+            }
+            while (cid + 1 < pre - 1 && cid + 1 < i) {
+                d[++cid].clear();
+            }
+            // dbg(i, vx[i], d[i], pre, cid);
+        }
+        vi ans(all(d[L - 1]));
+        return ans;
+    };
+
+    auto solve32 = [&](vii lra, vii lrb) {
+        int n = lra.size(), m = lrb.size();
+        auto clear = [](vii &lra, vii &lrb) {
+            vii nlra;
+            for (auto [l, r] : lra) {
+                int i = upper_bound(all(lrb), ii{l, INF}) - lrb.begin() - 1;
+                if (i >= 0 && i < lrb.size() && lrb[i][0] <= l && lrb[i][1] >= r) {
+
+                } else {
+                    nlra.pb({l, r});
+                }
+            }
+            return nlra;
+        };
+        lra = clear(lra, lrb);
+        lrb = clear(lrb, lra);
+        n = lra.size();
+        m = lrb.size();
+
+        vi xs;
+        FOR(i, n) {
+            xs.pb(lra[i][0]);
+            xs.pb(lra[i][1] + 1);
+        }
+        FOR(i, m) {
+            xs.pb(lrb[i][0]);
+            xs.pb(lrb[i][1] + 1);
+        }
+        auto vx = ccompress(xs);
+        int L = vx.size();
+        FOR(i, n) {
+            lra[i][0] = lower_bound(all(vx), lra[i][0]) - vx.begin();
+            lra[i][1] = lower_bound(all(vx), lra[i][1] + 1) - vx.begin();
+        }
+        FOR(i, m) {
+            lrb[i][0] = lower_bound(all(vx), lrb[i][0]) - vx.begin();
+            lrb[i][1] = lower_bound(all(vx), lrb[i][1] + 1) - vx.begin();
+        }
+        // dbg(lra);
+        // dbg(lrb);
+
+        vi prea(L, L), preb(L, L);
+        FOR(i, n) {
+            FOR(j, lra[i][0] + 1, lra[i][1]) {
+                prea[j] = lra[i][0];
+            }
+        }
+        FOR(i, m) {
+            FOR(j, lrb[i][0] + 1, lrb[i][1]) {
+                preb[j] = lrb[i][0];
+            }
+        }
+        // dbg(prea);
+        // dbg(preb);
+        // dbg(vx);
+        auto add = [](vi &a, int x) {
+            a.pb(x);
+            RFOR(i, a.size() - 1, 1) {
+                if (a[i] > a[i - 1]) {
+                    swap(a[i], a[i - 1]);
+                } else {
+                    break;
+                }
+            }
+        };
+
+        vvi d(L);
+        int cid = -1;
+        FOR(i, 1, L - 1) {
+            d[i] = d[i - 1];
+            int pre = min(prea[i], preb[i]);
+            assert(pre >= i - 3);
+            FOR(j, pre, i - 1) {
+                auto st = d[j];
+                add(st, vx[i] - vx[j]);
+                chmax(d[i], st);
+            }
+            while (cid + 1 < pre - 1 && cid + 1 < i) {
+                d[++cid].clear();
+            }
+            // dbg(i, vx[i], d[i], pre, cid);
+        }
+        return d[L - 1];
+    };
+
     auto solve4 = [&](vii lra, vii lrb) {
         // int n = lra.size(), m = lrb.size();
         auto clear = [](vii &lra, vii &lrb) {
@@ -522,7 +684,7 @@ int32_t main() {
             iint(n, m);
             vii lra(n), lrb(m);
             cin >> lra >> lrb;
-            auto ans = solve4(lra, lrb);
+            auto ans = solve32(lra, lrb);
             cout << ans.size() << nl;
             for (int x : ans) {
                 cout << x << ' ';
